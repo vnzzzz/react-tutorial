@@ -1,23 +1,19 @@
 import { useState } from "react";
 import ReactDOM from "react-dom/client";
-import { Repeat } from "typescript-tuple";
 import "./index.css";
 
-// 先後のマーク指定
-const mark1: string = "●";
-const mark2: string = "○";
+// import types
+import { mark1, mark2 } from "./types/marks";
+import { SquareProps } from "./types/SquareProps";
+import { BoardState } from "./types/BoardState";
+import { BoardProps } from "./types/BoardProps";
+import { Step } from "./types/Step";
+import { GameState } from "./types/GameState";
+
+// import utils
+import { calculateWinner } from "./utils/calculateWinner";
 
 // ---- Squareコンポーネント ------------------------------------
-// Squareの状態の型
-type SquareState = typeof mark1 | typeof mark2 | null;
-
-// Squareプロパティの型
-type SquareProps = {
-  value: SquareState;
-  onClick: () => void;
-};
-
-// Square コンポーネントの実装
 const Square = (props: SquareProps) => (
   <button className="square" onClick={props.onClick}>
     {props.value}
@@ -25,16 +21,6 @@ const Square = (props: SquareProps) => (
 );
 
 // ---- Boardコンポーネント ------------------------------------
-// Boardの状態の型
-type BoardState = Repeat<SquareState, 9>;
-
-// Boardのプロパティの型
-type BoardProps = {
-  squares: BoardState;
-  onClick: (i: number) => void;
-};
-
-// Board コンポーネントの実装
 const Board = (props: BoardProps) => {
   const renderSquare = (i: number) => (
     <Square value={props.squares[i]} onClick={() => props.onClick(i)} />
@@ -62,19 +48,6 @@ const Board = (props: BoardProps) => {
 };
 
 // ---- Gameコンポーネント ------------------------------------
-// Gameの特定のステップの型
-type Step = {
-  squares: BoardState;
-  mark1IsNext: boolean;
-};
-
-// Gameの状態の型
-type GameState = {
-  readonly history: Step[];
-  readonly stepNumber: number;
-};
-
-// Gameの実装
 const Game = () => {
   const [state, setState] = useState<GameState>({
     history: [
@@ -150,27 +123,6 @@ const Game = () => {
       </div>
     </div>
   );
-};
-
-// 勝敗判定用のヘルパー関数
-const calculateWinner = (squares: BoardState) => {
-  const lines = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
-  for (let i = 0; i < lines.length; i++) {
-    const [a, b, c] = lines[i];
-    if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
-    }
-  }
-  return null;
 };
 
 // ========================================
